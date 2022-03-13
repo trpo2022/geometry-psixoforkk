@@ -1,9 +1,27 @@
+CFLAGS = -Wall -Wextra -Werror
 
-Compile: main.c
-	gcc main.c -lm -Wall -Werror -o LabWork
+all: geometry
 
-Remove:
-	rm LabWork
+geometry: bin/geometry
 
-Run: 
-	./LabWork
+-include obj/src/geometry/main.d obj/src/staticlib/geometryshapes.d obj/src/staticlib/fileread.d
+
+bin/geometry: obj/src/geometry/main.o obj/src/staticlib/staticlib.a
+	gcc $(CFLAGS) -o $@ $^ -lm
+
+obj/src/geometry/main.o: src/geometry/main.c
+	gcc -c -I src $(CFLAGS) -o $@ $< -lm
+
+obj/src/staticlib/staticlib.a: obj/src/staticlib/geometryshapes.o obj/src/staticlib/fileread.o
+	ar rcs $@ $^
+
+obj/src/staticlib/geometryshapes.o: src/staticlib/geometryshapes.c
+	gcc -c -I src $(CFLAGS) -o $@ $< -lm
+
+obj/src/staticlib/fileread.o: src/staticlib/fileread.c
+	gcc -c -I src $(CFLAGS) -o $@ $< -lm
+
+.PHONY: clean
+
+clean:
+	rm obj/src/staticlib/*.a obj/src/staticlib/*.o obj/src/geometry/*.o bin/geometry

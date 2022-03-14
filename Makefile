@@ -4,8 +4,6 @@ all: geometry
 
 geometry: bin/geometry
 
--include obj/src/geometry/main.d obj/src/staticlib/geometryshapes.d obj/src/staticlib/fileread.d
-
 bin/geometry: obj/src/geometry/main.o obj/src/staticlib/staticlib.a
 	gcc $(CFLAGS) -o $@ $^ -lm
 

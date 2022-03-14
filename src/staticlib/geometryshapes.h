@@ -2,4 +2,3 @@
 
 void Circle(float*);
 void Triangle(float*);
-

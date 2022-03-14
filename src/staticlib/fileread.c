@@ -10,6 +10,10 @@ void FileRead()
 {
 	FILE* input_file;
 	input_file = fopen("input.txt", "r");
+	if (!input_file) 
+	{
+		return;
+	}
 	int i = 0;
 	float input_poz_circle[kCircleArraySize] = { 0 };
 	float input_poz_triangle[kTriangleArraySize] = { 0 };

@@ -1,10 +1,11 @@
+CC = gcc
+
 APP_NAME = geometry
 LIB_NAME = staticlib
 TEST_NAME = test
 
 CFLAGS = -Wall -Wextra -Werror
 CPPFLAGS = -I src -MP -MMD
-CPPFLAGST = -I thirdparty -MP -MMD
 LDFLAGS =
 LDLIBS =
 
@@ -42,14 +43,14 @@ $(LIB_PATH): $(LIB_OBJECTS)
 	ar rcs $@ $^
 
 $(OBJ_DIR)/%.o: %.c
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(CPPFLAGST) $< -o $@ -lm
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -I thirdparty $< -o $@ -lm
 
 test: $(TEST_PATH)
 
 -include $(DEPS)
 
 $(TEST_PATH): $(TEST_OBJECTS) $(LIB_PATH)
-	$(CC) $(CFLAGS) $(CPPFLAGST) $^ -o $@ $(LDFLAGS) $(LDLIBS) -lm
+	$(CC) $(CFLAGS) -I thirdparty $^ -o $@ $(LDFLAGS) $(LDLIBS) -lm
 
 clean:
 	$(RM) $(APP_PATH) $(TEST_PATH) $(LIB_PATH)

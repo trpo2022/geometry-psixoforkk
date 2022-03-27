@@ -6,16 +6,17 @@
 #define kCircleArraySize 3
 #define kTriangleArraySize 6
 
-void FileRead()
+int FileRead()
 {
     FILE* input_file;
     input_file = fopen("input.txt", "r");
     if (!input_file) {
-        return;
+        return 0;
     }
     int i = 0;
-    float input_poz_circle[kCircleArraySize] = {0};
-    float input_poz_triangle[kTriangleArraySize] = {0};
+    double perimeter = 0, area = 0;
+    double input_poz_circle[kCircleArraySize] = {0};
+    double input_poz_triangle[kTriangleArraySize] = {0};
     while (!feof(input_file)) {
         char input_k = 0;
         char input_line[127] = {0};
@@ -47,8 +48,9 @@ void FileRead()
                     d++;
                 }
             }
-            printf("Triangle Function:\n");
-            Triangle(input_poz_triangle);
+            perimeter = TrianglePerimeter(input_poz_triangle);
+            area = TriangleArea(input_poz_triangle);
+            printf("\nPerimeter: %lf\nArea: %lf\n", perimeter, area);
         }
         if (input_line[0] == 'c') {
             for (long unsigned int i = 0, d = 0; i <= strlen(input_line); i++) {
@@ -69,8 +71,10 @@ void FileRead()
                     d++;
                 }
             }
-            printf("Cirlce Function:\n");
-            Circle(input_poz_circle);
+            printf("\nCirlce Function:\n");
+            perimeter = CirclePerimeter(input_poz_circle);
+            area = CircleArea(input_poz_circle);
+            printf("\nPerimeter: %lf\nArea: %lf\n", perimeter, area);
         }
         for (int k = 0; k < kCircleArraySize; k++) {
             input_poz_circle[k] = 0;
@@ -81,6 +85,7 @@ void FileRead()
         i = 0;
     }
     fclose(input_file);
+    return 1;
 }
 
 int StrNumber(char input_symbol)

@@ -1,25 +1,57 @@
+APP_NAME = geometry
+LIB_NAME = staticlib
+TEST_NAME = test
+
 CFLAGS = -Wall -Wextra -Werror
+CPPFLAGS = -I src -MP -MMD
+CPPFLAGST = -I thirdparty -MP -MMD
+LDFLAGS =
+LDLIBS =
 
-all: geometry
+BIN_DIR = bin
+OBJ_DIR = obj
+SRC_DIR = src
+TEST_DIR = test
 
-geometry: bin/geometry
+APP_PATH = $(BIN_DIR)/$(APP_NAME)
+TEST_PATH = $(BIN_DIR)/$(TEST_NAME)
+LIB_PATH = $(OBJ_DIR)/$(SRC_DIR)/$(LIB_NAME)/$(LIB_NAME).a
 
-bin/geometry: obj/src/geometry/main.o obj/src/staticlib/staticlib.a
-	gcc $(CFLAGS) -o $@ $^ -lm
+SRC_EXT = c
 
-obj/src/geometry/main.o: src/geometry/main.c
-	gcc -c -I src $(CFLAGS) -o $@ $< -lm
+APP_SOURCES = $(shell find $(SRC_DIR)/$(APP_NAME) -name '*.$(SRC_EXT)')
+APP_OBJECTS = $(APP_SOURCES:$(SRC_DIR)/%.$(SRC_EXT)=$(OBJ_DIR)/$(SRC_DIR)/%.o)
 
-obj/src/staticlib/staticlib.a: obj/src/staticlib/geometryshapes.o obj/src/staticlib/fileread.o
+TEST_SOURCES = $(shell find $(TEST_DIR) -name '*.$(SRC_EXT)')
+TEST_OBJECTS = $(TEST_SOURCES:$(TEST_DIR)/%.$(SRC_EXT)=$(OBJ_DIR)/$(TEST_DIR)/%.o)
+
+LIB_SOURCES = $(shell find $(SRC_DIR)/$(LIB_NAME) -name '*.$(SRC_EXT)')
+LIB_OBJECTS = $(LIB_SOURCES:$(SRC_DIR)/%.$(SRC_EXT)=$(OBJ_DIR)/$(SRC_DIR)/%.o)
+
+DEPS = $(APP_OBJECTS:.o=.d) $(LIB_OBJECTS:.o=.d) $(TEST_OBJECTS:.o=.d)
+
+.PHONY: test clean
+all: $(APP_PATH)
+
+-include $(DEPS)
+
+$(APP_PATH): $(APP_OBJECTS) $(LIB_PATH)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS) -lm
+
+$(LIB_PATH): $(LIB_OBJECTS)
 	ar rcs $@ $^
 
-obj/src/staticlib/geometryshapes.o: src/staticlib/geometryshapes.c
-	gcc -c -I src $(CFLAGS) -o $@ $< -lm
+$(OBJ_DIR)/%.o: %.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(CPPFLAGST) $< -o $@ -lm
 
-obj/src/staticlib/fileread.o: src/staticlib/fileread.c
-	gcc -c -I src $(CFLAGS) -o $@ $< -lm
+test: $(TEST_PATH)
 
-.PHONY: clean
+-include $(DEPS)
+
+$(TEST_PATH): $(TEST_OBJECTS) $(LIB_PATH)
+	$(CC) $(CFLAGS) $(CPPFLAGST) $^ -o $@ $(LDFLAGS) $(LDLIBS) -lm
 
 clean:
-	rm obj/src/staticlib/*.a obj/src/staticlib/*.o obj/src/geometry/*.o bin/geometry
+	$(RM) $(APP_PATH) $(TEST_PATH) $(LIB_PATH)
+	find $(OBJ_DIR) -name '*.o' -exec $(RM) '{}' \;
+	find $(OBJ_DIR) -name '*.d' -exec $(RM) '{}' \;

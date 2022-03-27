@@ -2,7 +2,7 @@
 #include <staticlib/fileread.h>
 #include <stdlib.h>
 
-CTEST(arithmetic_circle_area, simple_area)
+CTEST(input_symbol, output_symbol)
 {
     int result = StrNumber('1');
     int expected = 1;
